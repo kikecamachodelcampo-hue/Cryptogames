@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/*
+  Colores y tipografías del proyecto. Con Tailwind v4 se definen aquí y después
+  se usan como clases: bg-fondo, text-pump, border-morado, font-titulo…
+*/
+@theme inline {
+  --color-fondo: #07070d;
+  --color-panel: #12121f;
+  --color-texto: #ececf5;
+  --color-suave: #8b8ba7;
+  --color-pump: #14f195; /* verde "sube" */
+  --color-dump: #ff3b6b; /* rojo "baja" */
+  --color-morado: #9945ff;
+  --color-amarillo: #ffd23f;
+
+  --font-sans: var(--font-geist-sans);
+  --font-titulo: var(--font-bungee);
+
+  --animate-ticker: ticker 30s linear infinite;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  /* Fondo con dos manchas de luz neón */
+  background-image:
+    radial-gradient(circle at 15% 0%, rgb(153 69 255 / 0.25), transparent 45%),
+    radial-gradient(circle at 90% 30%, rgb(20 241 149 / 0.12), transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Brillo neón para títulos */
+.neon-pump {
+  text-shadow:
+    0 0 8px rgb(20 241 149 / 0.7),
+    0 0 24px rgb(20 241 149 / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ticker,
+  .animate-ping {
+    animation: none;
+  }
+}
