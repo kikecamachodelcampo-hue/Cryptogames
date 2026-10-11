@@ -1,8 +1,14 @@
 // Portada (la página "/"). De momento muestra los juegos que vienen
 // y el estado de la conexión con el servidor.
-import { JUEGOS, NOMBRE_JUEGO } from "shared";
+import Link from "next/link";
+import { JUEGOS, NOMBRE_JUEGO, type IdJuego } from "shared";
 import { EstadoServidor } from "@/components/EstadoServidor";
 import { Ticker } from "@/components/Ticker";
+
+// Juegos que ya se pueden jugar y su página. Los que no estén aquí salen como "Próximamente".
+const RUTAS: Partial<Record<IdJuego, { href: string; texto: string }>> = {
+  duelo_oeste: { href: "/jugar/duelo-oeste/bot", texto: "Jugar contra el bot 🤖" },
+};
 
 export default function Inicio() {
   return (
@@ -34,12 +40,18 @@ export default function Inicio() {
             <div className="text-5xl">{juego.emoji}</div>
             <h2 className="font-titulo mt-3 text-xl">{juego.nombre}</h2>
             <p className="mt-1 text-sm text-suave">{juego.descripcion}</p>
-            <button
-              disabled
-              className="mt-4 w-full rounded-xl bg-pump/20 py-3 font-bold text-pump/60"
-            >
-              Próximamente 🔜
-            </button>
+            {RUTAS[juego.id] ? (
+              <Link
+                href={RUTAS[juego.id]!.href}
+                className="mt-4 block w-full rounded-xl bg-pump py-3 text-center font-bold text-fondo active:scale-95"
+              >
+                {RUTAS[juego.id]!.texto}
+              </Link>
+            ) : (
+              <button disabled className="mt-4 w-full rounded-xl bg-pump/20 py-3 font-bold text-pump/60">
+                Próximamente 🔜
+              </button>
+            )}
           </article>
         ))}
       </section>

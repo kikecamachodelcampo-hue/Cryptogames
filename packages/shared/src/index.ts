@@ -31,3 +31,5 @@ export interface RespuestaSalud {
   servidor: string;
   hora: number;
 }
+
+export * from "./dueloOeste";

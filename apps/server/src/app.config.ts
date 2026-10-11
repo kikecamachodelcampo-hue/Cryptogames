@@ -5,12 +5,14 @@
 import { defineServer, defineRoom, monitor } from "colyseus";
 import type { RespuestaSalud } from "shared";
 import { VestibuloRoom } from "./rooms/VestibuloRoom.js";
+import { DueloOesteRoom } from "./rooms/DueloOesteRoom.js";
 
 const server = defineServer({
   rooms: {
-    // Paso 1: una sala de prueba que solo cuenta cuánta gente hay conectada.
-    // En los siguientes pasos añadiremos "duelo_oeste" y "penaltis".
+    // Sala que solo cuenta cuánta gente hay conectada (piloto de la portada).
     vestibulo: defineRoom(VestibuloRoom),
+    // Duelo del oeste. Cada partida es una sala distinta.
+    duelo_oeste: defineRoom(DueloOesteRoom),
   },
 
   express: (app) => {

@@ -13,7 +13,9 @@ explicar cada paso, qué hace cada parte y cómo ejecutarlo.
 - **apps/web**: Next.js 16 (App Router, TypeScript, Tailwind v4, Turbopack). `cacheComponents` y
   `partialPrefetching` activos (los trae la plantilla). Antes de tocar Next, leer
   `node_modules/next/dist/docs/` (ver `apps/web/AGENTS.md`).
-- **Juegos**: Phaser 4 (ya instalado, aún sin usar).
+- **Juegos**: Phaser 4. Se carga con `import()` dinámico dentro de un `useEffect` (solo navegador).
+  Phaser solo pinta y detecta pulsaciones; el marcador y los botones son React encima del canvas.
+  Las skills de Phaser 4 están en `node_modules/phaser/skills/` (útiles: v3-to-v4-migration).
 - **apps/server**: Colyseus 0.18 (`defineServer` / `defineRoom`, estado con `@colyseus/schema` v5
   usando `schema({...})` + `t.*`), Express para rutas HTTP. Se ejecuta con `tsx` (sin compilar).
 - **packages/shared**: TypeScript común a web y servidor (se importa como `"shared"`;
@@ -40,15 +42,25 @@ explicar cada paso, qué hace cada parte y cómo ejecutarlo.
 apps/web/src/app/          páginas (layout, portada, manifest PWA, globals.css con colores)
 apps/web/src/components/   EstadoServidor (piloto de conexión), Ticker (cinta de frases)
 apps/web/src/lib/          servidor.ts (URL del servidor de juego)
+apps/web/src/juegos/       conexion.ts + un directorio por juego:
+  duelo-oeste/PartidaDuelo.tsx   conexión a la sala, pings, marcador, resultado, revancha
+  duelo-oeste/EscenaDuelo.ts     escena Phaser (desierto, vaqueros, "¡FUEGO!", input)
+apps/web/src/app/jugar/duelo-oeste/bot/   página del duelo contra bot
 apps/server/src/           index.ts (arranque), app.config.ts (salas + rutas HTTP)
-apps/server/src/rooms/     salas de Colyseus (VestibuloRoom = prueba de conexión)
-packages/shared/src/       constantes y tipos comunes (JUEGOS, PUERTO_SERVIDOR…)
+apps/server/src/rooms/     salas de Colyseus: VestibuloRoom (contador), DueloOesteRoom (árbitro)
+apps/server/src/logica/    cálculos puros testeables (latencia, reacción, ganador, bot)
+apps/server/test/          tests con node:test (npm test -w server)
+packages/shared/src/       constantes y tipos comunes (JUEGOS, DUELO, MSG, FaseDuelo…)
 ```
 
 ## Estado (plan por pasos)
 - [x] **1. Esqueleto**: monorepo, portada con estética, servidor Colyseus con sala `vestibulo`
       (contador de conectados) y ruta `/salud`.
-- [ ] 2. Duelo del oeste contra bot (lógica en servidor + escena Phaser).
+- [x] **2. Duelo del oeste contra bot**: sala `duelo_oeste` (opción `contraBot`), fases
+      preparados → esperando_senal → senal → resultado_ronda → fin; señal como mensaje directo;
+      pings del servidor cada 1 s (mediana de 10, compensación = ida, tope 150 ms); tras el primer
+      disparo se espera al rival solo mientras aún pueda ganar; bot 250–450 ms y 6 % de adelantarse.
+      Página `/jugar/duelo-oeste/bot` con revancha (crea sala nueva).
 - [ ] 3. Duelo 1 vs 1 por código de sala + compensación de latencia.
 - [ ] 4. Login Supabase (invitado + email) y perfiles; el servidor valida el JWT.
 - [ ] 5. ELO, historial, perfil (V/D/racha) y ranking global.
@@ -60,5 +72,5 @@ packages/shared/src/       constantes y tipos comunes (JUEGOS, PUERTO_SERVIDOR�
 ## Comandos
 - `npm install` — instala todo (raíz).
 - `npm run dev` — web en http://localhost:3000 y servidor en http://localhost:2567.
-- `npm run lint -w web`, `npm run typecheck`, `npm run build` — comprobaciones.
+- `npm run lint -w web`, `npm run typecheck`, `npm run build`, `npm test` — comprobaciones.
 - Panel de salas (desarrollo): http://localhost:2567/monitor
